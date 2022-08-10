@@ -251,15 +251,14 @@ height = 6
 
 
 
-
 A = c("ZIP", "HSA", "Bliss", "Loewe")
-
-
-for (i in c(1, 2,3,4)){
+B = c("2D","3D")
+for (i in c(1, 2)){
+  for(j in c(1,2,3,4)) {
 PlotSynergy(
 res,
-type = "3D",
-method = A[i],
+type = B[i],
+method = A[j],
 block_ids = c(1),
 drugs = c(1, 2),
 row_range = NULL,
@@ -287,6 +286,7 @@ height = 6,
 width = 6,
 units = "in"
 )
+}
 }
 
 #c("ZIP", "HSA", "Bliss", "Loewe")
