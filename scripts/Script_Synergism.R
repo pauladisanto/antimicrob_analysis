@@ -1,5 +1,5 @@
-#levantar planilla sinergia
-filename = "Primera_prueba_Sinergia_E_coli_Kanamicina_Gentamicina_resazurina.csv"
+#to adapt the excel file to something readeble for R (96 wells)
+filename = "Primera_prueba_Sinergia_E_coli_Ampicilina_Gentamicina.csv"
  raw_data = read.table(filename, skip=14, header=FALSE, sep="\t")
 
 
@@ -87,31 +87,12 @@ compounds$Seleccion<-"Seleccion"
 
 
 
-#expression(paste(("\U00B5"g/"\U00B5"l))
-
-
-#block_id  drug_row  drug_col conc_r  conc_c  response conc_r_unit conc_c_unit
-
-#Tabla_Analisis<-subset(compounds, Seleccion=="Seleccion", select=c(block_id , drug_row,  drug_col, conc_r,  conc_c,  response))
-
 Tabla_Analisis<-subset(compounds, Seleccion=="Seleccion", select=c(block_id , drug_row,  drug_col, conc_r,  conc_c,  response, conc_r_unit, conc_c_unit))
+Control_positivo = subset(Tabla_Analisis, conc_c == 0 & conc_r == 0 , select=c(response, conc_r,  conc_c))
 
-#Tabla_Analisis$response = Tabla_Analisis$response / 1.897
-#Tabla_Analisis$response = Tabla_Analisis$response / 2.167
-#Tabla_Analisis$response = Tabla_Analisis$response /2.59
-#Tabla_Analisis$response = Tabla_Analisis$response /2.307
-
-
-#Tabla_Analisis$response = Tabla_Analisis$response / 74955
-#Tabla_Analisis$response = Tabla_Analisis$response / 112075
-#Tabla_Analisis$response = Tabla_Analisis$response /69495
-Tabla_Analisis$response = Tabla_Analisis$response /70613
-
-
+CONPOS = mean(Control_positivo$response)
+Tabla_Analisis$response = Tabla_Analisis$response / CONPOS
 Tabla_Analisis$response = Tabla_Analisis$response *100
-
-
-
 
 
 ####################analisis_interaccion#################################
