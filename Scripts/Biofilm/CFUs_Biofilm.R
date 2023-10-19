@@ -2,6 +2,7 @@ library(ggplot2)
 library(reshape2)
 library(data.table)
 library("agricolae")
+library(DescTools)
 
 
 #generates a list with the three dataframes           
@@ -157,15 +158,28 @@ colnames(melted_df) <- c("Concentration", "Log10_mean")
 
 melted_df$Concentration= as.numeric(melted_df$Concentration)
 
+#add a column with treatment and control
 
+treatment =  rev(c("C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "C0"))
+
+melted_df = data.frame(melted_df, Treatment = treatment)
+
+#====================================================================
+aovScreening<-aov(Log10_mean~Treatment,data=melted_df)
+summary(aovScreening)
+
+#perform Dunnett's Test
+DunnettTest(x=melted_df$Log10_mean, g=melted_df$Treatment)
+
+#Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 #====================================================================
 #agricolae test
 
-aovScreening<-aov(Log10_mean~Concentration,data=melted_df)
-summary(aovScreening)
+#aovScreening<-aov(Log10_mean~Concentration,data=melted_df)
+#summary(aovScreening)
 
-postestScreening<-LSD.test(aovScreening, "Concentration")
-print(postestScreening)
+#postestScreening<-LSD.test(aovScreening, "Concentration")
+#print(postestScreening)
 
 #====================================================================
 #Means
@@ -195,21 +209,25 @@ df_plot = data.frame(
 df_plot$Conc <- factor(df_plot$Conc, levels = df_plot$Conc)
 
 title = "CFU S. epidermidis C1 Replicas 1, 2 and 3"
-significances = c("abc", "a", "a", "a", "a", "ab", "bcd", "d", "cd", "de", "d", "de", "e")
+#significances = c("abc", "a", "a", "a", "a", "ab", "bcd", "d", "cd", "de", "d", "de", "e")
+significances = c("", "", "", "", "", "*", "**", "*", "**", "***", "***", "***", "***")
 xc = c(1,2,3,4,5,6,7,8,9,10,11,12,13)
 distance = c(0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16, 0.16)
-textSize=8
+textSize=6
 Mean_i = df_plot$Log10_mean
 SD_i = df_plot$SD
 
 p <- ggplot(data=df_plot, aes(x=Conc, y=Log10_mean)) + 
           theme_bw() +
-          geom_bar(stat="identity",  width=0.9, fill = "blue")+ 
+          geom_bar(stat="identity",  width=0.9, fill = "coral2")+ 
           ylim(0, 7)+
           geom_errorbar(aes(ymin=Log10_mean-SD, ymax=Log10_mean+SD), width=0.2, position=position_dodge(0.05)) +  
-              theme(axis.text.x = element_text(color="black", size=12, angle=10)) +
+              theme(axis.text.x = element_text(color="black", size=10, angle=10)) +
               theme(legend.position="top",legend.title = element_text(size = textSize), legend.text  = element_text(size = textSize)) + 
           labs(title=element_blank(), x=expression(paste("Compound concentration (", mu, "M)")), y = "Log 10 (Mean)")+
-          annotate("text", x = xc, y = Mean_i+SD_i+distance, label = significances, size = 7, family = "Times", fontface = "bold.italic", colour = "black")+
+          annotate("text", x = xc, y = Mean_i+SD_i+distance, label = significances, size = 3, family = "Times", fontface = "bold.italic", colour = "black")+
                                                                              ggtitle(title)
 
+ggsave(filename = "CFU_S_epidermidis.pdf", plot = p, width = 7, height = 4, units = "in", dpi = 300)
+
+ggsave(filename = "CFU_S_epidermidis.png", plot = p, width = 7, height = 4, units = "in", dpi = 300)
